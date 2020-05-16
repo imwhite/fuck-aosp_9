@@ -1295,6 +1295,9 @@ class Dex2Oat FINAL {
       Usage(error_msg.c_str());
     }
 
+    // by white. force setting --compiler-filter=verify
+    compiler_options_.get()->SetCompilerFilter(CompilerFilter::kVerify);
+
     ProcessOptions(parser_options.get());
 
     // Insert some compiler things.

@@ -1343,6 +1343,11 @@ bool Runtime::Init(RuntimeArgumentMap&& runtime_options_in) {
     jit_options_->SetSaveProfilingInfo(false);
   }
 
+
+  // by white. always disable jit
+  jit_options_->SetUseJitCompilation(false);
+  jit_options_->SetSaveProfilingInfo(false);
+
   // Use MemMap arena pool for jit, malloc otherwise. Malloc arenas are faster to allocate but
   // can't be trimmed as easily.
   const bool use_malloc = IsAotCompiler();
@@ -2438,6 +2443,9 @@ void Runtime::AddCurrentRuntimeFeaturesAsDex2OatArguments(std::vector<std::strin
 }
 
 void Runtime::CreateJit() {
+  // by white. add log
+  LOG(WARNING) << "  >>>  JIT Created! <<< ";
+  
   CHECK(!IsAotCompiler());
   if (kIsDebugBuild && GetInstrumentation()->IsForcedInterpretOnly()) {
     DCHECK(!jit_options_->UseJitCompilation());

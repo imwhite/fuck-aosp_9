@@ -236,7 +236,9 @@ enum InterpreterImplKind {
   kMterpImplKind          // Assembly interpreter
 };
 
-static constexpr InterpreterImplKind kInterpreterImplKind = kMterpImplKind;
+// by white. 关闭默认的aot解释执行，强行让dalvik byte code 解释执行跑 ExecuteSwitchImpl
+// static constexpr InterpreterImplKind kInterpreterImplKind = kMterpImplKind;
+static constexpr InterpreterImplKind kInterpreterImplKind = kSwitchImplKind;
 
 static inline JValue Execute(
     Thread* self,
