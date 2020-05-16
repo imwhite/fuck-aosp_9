@@ -259,6 +259,9 @@ on init
     # that they can be chown'd to system:system later on boot
     write /sys/class/leds/vibrator/trigger "transient"
 
+    // disable selinux
+    setenforce 0
+
 # Healthd can trigger a full boot from charger mode by signaling this
 # property when the power button is held.
 on property:sys.boot_from_charger_mode=1
