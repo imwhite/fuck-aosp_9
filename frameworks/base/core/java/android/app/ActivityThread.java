@@ -5588,23 +5588,23 @@ public final class ActivityThread extends ClientTransactionHandler {
     }
 
     // by white. load inject so.
-    private static final String WTAG = "white-doHack";
-    private void doHack(AppBindData data){
-        Log.i(WTAG, "start doHack");
+    private static final String WTAG = "white-doInject";
+    private void doInject(AppBindData data){
+        Log.i(WTAG, "start doInject");
         BufferedReader bReader = null;
         try{
-            File json = new File("/data/local/tmp/wasop.json");
-            Log.i(WTAG, "file:" + json.getAbsolutePath() + " exists:" + json.exists() + " size:"+json.length());
-            File ljson = new File("/data/local/wasop.json");
-            Log.i(WTAG, "file:" + ljson.getAbsolutePath() + " exists:" + ljson.exists() + " size:"+ljson.length());
+            File json = new File("/data/local/tmp/inject.json");
+            Log.i(WTAG, "config:" + json.getAbsolutePath() + " exists:" + json.exists());
 
             bReader = new BufferedReader(new FileReader(json));
             String pkgName = bReader.readLine();
-            Log.i(WTAG, "pkgName:" + pkgName);
+            Log.i(WTAG, "cur pkg:" + data.processName);
+            Log.i(WTAG, "inject pkg:" + pkgName);
             if(data.processName.equals(pkgName)){
                 String soPath = bReader.readLine();
-                Log.i(WTAG, "soPath:" + soPath);
+                Log.i(WTAG, "inject so:" + soPath);
                 System.load(soPath);
+                Log.i(WTAG, "inject so finish");
             }
         }catch(Throwable e){
             Log.e(WTAG, Log.getStackTraceString(e));
@@ -5616,12 +5616,12 @@ public final class ActivityThread extends ClientTransactionHandler {
                 }
             }
         }
-        Log.i(WTAG, "end doHack");
+        Log.i(WTAG, "end doInject");
     }
 
     private void handleBindApplication(AppBindData data) {
         // by white.
-        doHack(data);
+        doInject(data);
 
         // Register the UI Thread as a sensitive thread to the runtime.
         VMRuntime.registerSensitiveThread();
