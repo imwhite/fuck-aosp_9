@@ -184,9 +184,11 @@ import java.util.TimeZone;
 import java.util.concurrent.Executor;
 
 // by white.
-import java.io.BufferedReader;
+import org.json.JSONObject;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 final class RemoteServiceException extends AndroidRuntimeException {
     public RemoteServiceException(String msg) {
@@ -5588,20 +5590,30 @@ public final class ActivityThread extends ClientTransactionHandler {
     }
 
     // by white. load inject so.
-    private static final String WTAG = "white-doInject";
+    private static final String WTAG = "white-inject";
     private void doInject(AppBindData data){
-        Log.i(WTAG, "start doInject");
-        BufferedReader bReader = null;
+        Log.i(WTAG, "start");
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        InputStream is = null;
         try{
-            File json = new File("/data/local/tmp/inject.json");
+            File json = new File("/data/local/tmp/white/inject.cfg");
             Log.i(WTAG, "config:" + json.getAbsolutePath() + " exists:" + json.exists());
 
-            bReader = new BufferedReader(new FileReader(json));
-            String pkgName = bReader.readLine();
+            is = new FileInputStream(json);
+
+            byte[] buf = new byte[1024];
+            int len = -1;
+            while((len = is.read(buf, 0, buf.length)) != -1){
+                bos.write(buf, 0, len);
+            }
+            JSONObject jsonObj = new JSONObject(bos.toString());
+            String pkgName = jsonObj.getString("pkg_name");
+
             Log.i(WTAG, "cur pkg:" + data.processName);
             Log.i(WTAG, "inject pkg:" + pkgName);
             if(data.processName.equals(pkgName)){
-                String soPath = bReader.readLine();
+                String soPath = jsonObj.getString("so_path");
                 Log.i(WTAG, "inject so:" + soPath);
                 System.load(soPath);
                 Log.i(WTAG, "inject so finish");
@@ -5609,14 +5621,16 @@ public final class ActivityThread extends ClientTransactionHandler {
         }catch(Throwable e){
             Log.e(WTAG, Log.getStackTraceString(e));
         }finally {
-            if (bReader != null) {
-                try {
-                    bReader.close();
-                } catch (IOException e) {
-                }
+            try {
+                is.close();
+            } catch (Exception e) {
+            }
+            try {
+                bos.close();
+            } catch (Exception e) {
             }
         }
-        Log.i(WTAG, "end doInject");
+        Log.i(WTAG, "end");
     }
 
     private void handleBindApplication(AppBindData data) {
