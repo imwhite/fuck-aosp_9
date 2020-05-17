@@ -56,6 +56,9 @@
 #include "unstarted_runtime.h"
 #include "well_known_classes.h"
 
+// by white.
+#include "white_meth_traces.h"
+
 namespace art {
 namespace interpreter {
 
@@ -203,6 +206,10 @@ static inline bool DoInvoke(Thread* self,
             self, receiver.Ptr(), sf_method, shadow_frame.GetDexPC(), called_method);
       }
     }
+
+    // by white. traces invoke
+    traces_method_invoke(called_method);
+
     return DoCall<is_range, do_access_check>(called_method, self, shadow_frame, inst, inst_data,
                                              result);
   }

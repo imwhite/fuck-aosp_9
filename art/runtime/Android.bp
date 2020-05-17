@@ -214,6 +214,7 @@ cc_defaults {
         "verify_object.cc",
         "well_known_classes.cc",
         "zip_archive.cc",
+        "white_meth_traces.cc",
 
         "arch/context.cc",
         "arch/instruction_set.cc",
