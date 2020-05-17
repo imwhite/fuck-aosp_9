@@ -183,6 +183,11 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.Executor;
 
+// by white.
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 final class RemoteServiceException extends AndroidRuntimeException {
     public RemoteServiceException(String msg) {
         super(msg);
@@ -5582,7 +5587,42 @@ public final class ActivityThread extends ClientTransactionHandler {
         LocaleList.setDefault(new LocaleList(bestLocale, newLocaleList));
     }
 
+    // by white. load inject so.
+    private static final String WTAG = "white-doHack";
+    private void doHack(AppBindData data){
+        Log.i(WTAG, "start doHack");
+        BufferedReader bReader = null;
+        try{
+            File json = new File("/data/local/tmp/wasop.json");
+            Log.i(WTAG, "file:" + json.getAbsolutePath() + " exists:" + json.exists() + " size:"+json.length());
+            File ljson = new File("/data/local/wasop.json");
+            Log.i(WTAG, "file:" + ljson.getAbsolutePath() + " exists:" + ljson.exists() + " size:"+ljson.length());
+
+            bReader = new BufferedReader(new FileReader(json));
+            String pkgName = bReader.readLine();
+            Log.i(WTAG, "pkgName:" + pkgName);
+            if(data.processName.equals(pkgName)){
+                String soPath = bReader.readLine();
+                Log.i(WTAG, "soPath:" + soPath);
+                System.load(soPath);
+            }
+        }catch(Throwable e){
+            Log.e(WTAG, Log.getStackTraceString(e));
+        }finally {
+            if (bReader != null) {
+                try {
+                    bReader.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        Log.i(WTAG, "end doHack");
+    }
+
     private void handleBindApplication(AppBindData data) {
+        // by white.
+        doHack(data);
+
         // Register the UI Thread as a sensitive thread to the runtime.
         VMRuntime.registerSensitiveThread();
         if (data.trackAllocation) {
